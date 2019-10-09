@@ -1,0 +1,82 @@
+---
+title: "p8105_hw3_xc2473"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+library(p8105.datasets)
+data("instacart")
+
+####import and clean the datasett
+
+ins_df = 
+  instacart %>%   
+  janitor::clean_names() %>% 
+  select(-eval_set, -aisle_id, -department_id)  
+
+n_distinct(pull(ins_df, aisle))
+
+aisle_df_10000 = 
+  instacart %>% 
+  group_by(aisle) %>%
+     summarize(number_of_aisle = n()) %>% 
+  filter(number_of_aisle > 10000) %>% 
+  arrange(number_of_aisle)
+
+###Make a plot that shows the number of items ordered in each aisle
+
+aisle_df_10000 %>% 
+  ggplot(aes(x = aisle, y = number_of_aisle)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = " Number of items ordered in each aisle (among aisles with more than 10000 items ordered) ")
+
+###Make a table showing the three most popular items in each of the aisles
+
+aisle_3popular_items = 
+  ins_df %>% 
+  filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(n = n()) %>% 
+  mutate(rank = min_rank(desc(n))) %>% 
+  filter(rank < 4) %>% 
+  select(-n) %>% 
+  pivot_wider(
+    names_from = "rank",
+    values_from = "product_name") %>% 
+  select(aisle, most_popular = "1",  second_most_popular = "2", third_most_popular = "3") %>% 
+  knitr::kable()
+
+### Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week
+         
+order_hour = 
+  ins_df %>% 
+  filter(product_name == "Pink Lady Apples" | product_name == "Coffee Ice Cream") %>% 
+  select(product_name, order_dow, order_hour_of_day) %>% 
+  group_by(product_name, order_dow) %>% 
+  summarize(mean_hour = mean(order_hour_of_day)) %>% 
+  pivot_wider(
+    names_from = "product_name", 
+    values_from = "mean_hour") %>% 
+  select(-order_dow) %>% 
+  knitr::kable()
+    
+
+
+  
+                    
+
+
+
+  drop_na(wt_gain)
+
+```
+
