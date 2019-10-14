@@ -1,0 +1,38 @@
+---
+title: "check"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+x = rnorm(500)
+y = rnorm(500)
+vec_logic_1 = ifelse((x + y) > 1, TRUE, FALSE)
+num = as.numeric(vec_logic_1)
+fac = as.factor(vec_logic_1)
+question_2_df = tibble(
+  x,
+  y,
+  vec_logic_1,
+  num,
+  fac
+)
+```
+This dataset contain `r nrow(question_2_df)` rows and `r ncol(question_2_df)` columns.
+The mean of x is `r mean(x)`.
+The median of x is `r median(x)`.
+The standard deviation of x is `r sd(x)`.
+The proportion of cases for which x + y > 1 is `r sum(vec_logic_1, na.rm = TRUE)/nrow(question_2_df)`.
+
+```{r}
+ggplot(question_2_df, aes(x = x, y = y, color = "red")) + geom_point()
+ggsave("myplot.pdf")
+ggplot(question_2_df, aes(x = x, y = y, color = num)) + geom_point()
+       
+```
+
