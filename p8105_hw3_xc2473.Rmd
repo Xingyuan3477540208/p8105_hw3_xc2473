@@ -15,10 +15,10 @@ options(digits = 3)
 library(tidyverse)
 library(ggridges)
 
+###Question 1
+
 library(p8105.datasets)
 data("instacart")
-
-####import and clean the datasett
 
 ins_df = 
   instacart %>%   
@@ -117,9 +117,43 @@ brfss %>%
   geom_boxplot(aes(fill = response), color = "blue", alpha = .5) +
   facet_grid(~year)
   
+### Question3
+accl = read_csv(file = "./accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "activity",
+    names_prefix = "activity_",
+    values_to = "value") 
 
+a =
+  accl %>% 
+  filter(day == "Saturday", week == 4)
 
-  drop_na(wt_gain)
+accl_day = 
+  accl %>% 
+  group_by(week, day) %>% 
+  summarize(day_activity = sum(value, na.rm = TRUE)) %>% 
+  mutate(weekdays_vs_weekends = ifelse(day == "Saturday", "Weekend",
+                                       ifelse(day == "Sunday", "Weekend", "Weekday")))
+
+accl_hour =
+  accl %>%
+  mutate(hour = ceiling(as.numeric(activity) / 60)) %>% 
+  group_by(week, day, hour) %>% 
+  summarize(hour_activity = sum(value, na.rm = TRUE)) %>% 
+  group_by(day, hour) %>% 
+  summarize(ave_activity = mean(hour_activity)) %>% 
+  ungroup(day) %>% 
+  mutate(day = as.factor(day),
+         day = fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) 
+
+accl_hour %>% 
+ggplot(aes(x = hour, y = ave_activity, color = day)) + 
+  geom_smooth(se = FALSE) +
+  labs(title = "24-hour activity time courses for each day in a week")
+ 
+
 
 ```
 
